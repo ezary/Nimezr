@@ -125,6 +125,60 @@
             padding: 8px 16px;
             border-radius: 20px;
         }
+
+        /* Styles for browser selection modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            color: #333;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .browser-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .browser-option:hover {
+            background: #f0f0f0;
+        }
+
+        .browser-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -144,23 +198,89 @@
         <p class="notice">You'll be redirected to: nimezr.blogspot.com</p>
     </div>
 
+    <!-- Browser Selection Modal -->
+    <div class="modal" id="browserModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2>Select Browser</h2>
+            <p>Choose how you want to open the website:</p>
+            
+            <div class="browser-option" id="defaultBrowser">
+                <svg class="browser-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                <span>Default Browser</span>
+            </div>
+            
+            <div class="browser-option" id="newTab">
+                <svg class="browser-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V8h14v10z"/>
+                </svg>
+                <span>New Tab in This Browser</span>
+            </div>
+            
+            <div class="browser-option" id="copyLink">
+                <svg class="browser-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+                <span>Copy Link to Clipboard</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         const btn = document.getElementById('redirectBtn');
+        const modal = document.getElementById('browserModal');
+        const closeModal = document.getElementById('closeModal');
+        const defaultBrowserOption = document.getElementById('defaultBrowser');
+        const newTabOption = document.getElementById('newTab');
+        const copyLinkOption = document.getElementById('copyLink');
+        
+        const targetUrl = "https://nimezr.blogspot.com";
         
         btn.addEventListener('click', () => {
-            // Animasi sebelum redirect
-            btn.innerHTML = 'Opening...';
-            btn.style.pointerEvents = 'none';
-            
-            // Efek loading
-            setTimeout(() => {
-                btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Loading';
-                
-                // Redirect setelah 1.5 detik
-                setTimeout(() => {
-                    window.location.href = "https://nimezr.blogspot.com";
-                }, 1500);
-            }, 300);
+            modal.style.display = 'flex';
+        });
+        
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        
+        defaultBrowserOption.addEventListener('click', () => {
+            // This will attempt to open in default browser (works if launched from electron or similar)
+            // In regular web browsers, it will just open in a new tab
+            window.location.href = targetUrl;
+            modal.style.display = 'none';
+        });
+        
+        newTabOption.addEventListener('click', () => {
+            window.open(targetUrl, '_blank');
+            modal.style.display = 'none';
+        });
+        
+        copyLinkOption.addEventListener('click', () => {
+            navigator.clipboard.writeText(targetUrl).then(() => {
+                alert('Link copied to clipboard!');
+                modal.style.display = 'none';
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = targetUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Link copied to clipboard!');
+                modal.style.display = 'none';
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
         });
     </script>
 </body>
