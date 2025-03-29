@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚠️ Open in Browser | Nimezr Blog</title>
+    <title>Redirecting to Nimezr</title>
     <style>
         :root {
             --primary: #6e45e2;
             --secondary: #89d4cf;
-            --warning: #ff4757;
         }
         
         body {
@@ -22,15 +21,14 @@
             min-height: 100vh;
             color: white;
             text-align: center;
-            overflow: hidden;
         }
 
         .container {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
             border-radius: 24px;
             padding: 40px;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
             width: 90%;
             max-width: 420px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -40,145 +38,63 @@
             margin: 0 0 20px;
             font-size: 24px;
             font-weight: 600;
-            color: #fff;
-        }
-
-        .warning-box {
-            background: rgba(255, 71, 87, 0.2);
-            border: 1px solid var(--warning);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-
-        .instruction {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        .instruction ol {
-            padding-left: 20px;
-            margin: 15px 0 0;
-        }
-
-        .instruction li {
-            margin-bottom: 10px;
-        }
-
-        .btn-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
         }
 
         .btn {
-            padding: 16px;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: block;
-        }
-
-        .btn-primary {
+            display: inline-block;
+            padding: 16px 32px;
             background: white;
             color: var(--primary);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .copy-link {
-            margin-top: 20px;
-            font-size: 12px;
-            opacity: 0.8;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border: none;
             cursor: pointer;
-            text-decoration: underline;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="warning-box">
-            ⚠️ Instagram Browser is Limited
-        </div>
-        
-        <h1>For Full Experience</h1>
-        <p>Please open in Chrome/Safari</p>
-        
-        <div class="instruction">
-            <strong>How to open:</strong>
-            <ol>
-                <li>Tap <strong>three dots</strong> at top right</li>
-                <li>Select <strong>"Open in browser"</strong></li>
-                <li>Or copy link below and paste in Chrome</li>
-            </ol>
-        </div>
-        
-        <div class="btn-container">
-            <a href="https://nimezr.blogspot.com" class="btn btn-primary" id="mainBtn">TRY OPENING IN BROWSER</a>
-            <a href="#" class="btn btn-secondary" id="copyBtn">COPY LINK</a>
-        </div>
-        
-        <div class="copy-link" id="linkText">https://nimezr.blogspot.com</div>
+        <h1>Welcome to Nimezr</h1>
+        <button class="btn" id="redirectBtn">Continue to Website</button>
     </div>
 
     <script>
-        const mainBtn = document.getElementById('mainBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const linkText = document.getElementById('linkText');
+        const btn = document.getElementById('redirectBtn');
         const url = "https://nimezr.blogspot.com";
         
-        // Main button action
-        mainBtn.addEventListener('click', (e) => {
-            e.preventDefault();
+        function redirectToExternal() {
+            // 1. Android Chrome Intent
+            window.location.href = `intent://nimezr.blogspot.com#Intent;scheme=https;package=com.android.chrome;end`;
             
-            // 1. Try Android Chrome intent
-            try {
-                window.location.href = `intent://nimezr.blogspot.com#Intent;scheme=https;package=com.android.chrome;end`;
-            } catch (e) {}
-            
-            // 2. Try iOS Chrome
+            // 2. iOS Chrome Scheme
             setTimeout(() => {
                 window.location.href = `googlechrome://nimezr.blogspot.com`;
-            }, 300);
+            }, 50);
             
-            // 3. Final fallback
+            // 3. Standard Redirect
             setTimeout(() => {
-                window.open(url, '_blank');
-            }, 600);
-        });
+                window.location.href = url;
+            }, 100);
+        }
+
+        // Auto-redirect on page load
+        redirectToExternal();
         
-        // Copy link function
-        copyBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigator.clipboard.writeText(url).then(() => {
-                copyBtn.textContent = 'COPIED!';
-                setTimeout(() => {
-                    copyBtn.textContent = 'COPY LINK';
-                }, 2000);
-            });
-        });
-        
-        // Make link text copyable
-        linkText.addEventListener('click', () => {
-            navigator.clipboard.writeText(url);
-            linkText.textContent = 'Link copied!';
-            setTimeout(() => {
-                linkText.textContent = url;
-            }, 2000);
-        });
+        // Manual redirect via button
+        btn.addEventListener('click', redirectToExternal);
     </script>
 </body>
 </html>
