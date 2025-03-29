@@ -125,14 +125,30 @@
             padding: 8px 16px;
             border-radius: 20px;
         }
+
+        .manual-open {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Welcome to Nimezr</h1>
-        <p>For the best experience, we'll open the site in your default browser. This ensures full functionality.</p>
+        <p>For the best experience, please open this link in Chrome or your default browser.</p>
         
         <button class="btn" id="redirectBtn">Continue to Website</button>
+        
+        <div id="manualOpen" class="manual-open">
+            <p>If nothing happens, please:</p>
+            <ol style="text-align: left; padding-left: 20px;">
+                <li>Tap the <strong>three dots</strong> at the top right</li>
+                <li>Select <strong>"Open in Browser"</strong></li>
+            </ol>
+        </div>
         
         <div class="security-badge">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -146,6 +162,8 @@
 
     <script>
         const btn = document.getElementById('redirectBtn');
+        const manualOpen = document.getElementById('manualOpen');
+        const url = "https://nimezr.blogspot.com";
         
         btn.addEventListener('click', () => {
             // Animasi sebelum redirect
@@ -156,15 +174,25 @@
             setTimeout(() => {
                 btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Loading';
                 
-                const url = "https://nimezr.blogspot.com";
+                // 1. Coba intent Android
+                const androidIntent = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
                 
-                // Coba buka di tab/window baru
+                // 2. Coba iOS Chrome
+                const iosChrome = `googlechrome://${url}`;
+                
+                // 3. Coba window.open dengan fallback
                 const newWindow = window.open(url, '_blank');
                 
-                // Fallback jika popup diblokir
+                // Timer untuk mengecek apakah berhasil dibuka
                 setTimeout(() => {
                     if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                        // 4. Coba location.href sebagai fallback terakhir
                         window.location.href = url;
+                        
+                        // Tampilkan instruksi manual setelah 2 detik
+                        setTimeout(() => {
+                            manualOpen.style.display = 'block';
+                        }, 2000);
                     }
                 }, 500);
             }, 300);
